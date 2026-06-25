@@ -1,0 +1,21 @@
+{
+  "name": "obsidian-wiki-clipper",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.2.0",
+    "@types/turndown": "^5.0.6",
+    "typescript": "^5.0.0",
+    "wxt": "^0.20.27"
+  },
+  "dependencies": {
+    "defuddle": "0.19.1",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}

@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/generic-clipping-stack.md", "reason": "推荐技术栈 defuddle+turndown 与平台覆盖度(6/10)，决定哪些平台复用、哪些自写"}
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/english-platforms.md", "reason": "英文平台抽取细节(Reddit/HN/GitHub/Medium/YouTube字幕)，作为 defuddle 不足时的备选实现"}
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/chinese-platforms.md", "reason": "4个自写中文平台 adapter 的选择器/懒加载图属性/MAIN world/B站字幕流程，实现直接依据"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "核心决策是复用 defuddle/turndown 而非自写正则，落地时持续遵循"}

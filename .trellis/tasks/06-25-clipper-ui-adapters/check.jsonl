@@ -1,0 +1,5 @@
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/generic-clipping-stack.md", "reason": "核对是否正确复用 defuddle 覆盖的平台、未重复造轮子、版本锁定"}
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/chinese-platforms.md", "reason": "核对中文平台 adapter 选择器/懒加载图属性/登录态处理是否与调研一致"}
+{"file": ".trellis/tasks/06-25-clipper-ui-adapters/research/english-platforms.md", "reason": "核对 YouTube/B站字幕等 fallback 逻辑是否健全"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "审查是否存在本可复用 defuddle 却自写的重复逻辑"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "审查 content→background→vault 跨层数据流(RawCapture/路由)是否一致"}

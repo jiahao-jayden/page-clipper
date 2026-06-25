@@ -1,0 +1,11 @@
+# 依赖与构建产物（可重新生成，勿同步/勿提交）
+node_modules
+.output
+.wxt
+
+# 环境变量
+.env.local
+*.local
+
+# 系统
+.DS_Store
