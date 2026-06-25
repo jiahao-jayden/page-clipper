@@ -1,5 +1,7 @@
 import type { RawCapture } from '../normalize'
 import * as twitter from './twitter'
+import * as zhihu from './zhihu'
+import * as wechat from './wechat'
 import * as generic from './generic'
 
 export interface Adapter {
@@ -18,6 +20,8 @@ export interface Adapter {
  */
 const adapters: Adapter[] = [
   { name: 'twitter', matches: twitter.matches, extract: twitter.extract },
+  { name: 'zhihu', matches: zhihu.matches, extract: zhihu.extract },
+  { name: 'wechat', matches: wechat.matches, extract: wechat.extract },
   { name: 'generic', matches: generic.matches, extract: generic.extract },
 ]
 
