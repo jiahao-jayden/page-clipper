@@ -14,10 +14,10 @@ This directory contains guidelines for frontend development. Fill in each file w
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | To fill |
-| [Component Guidelines](./component-guidelines.md) | Component patterns, props, composition | To fill |
-| [Hook Guidelines](./hook-guidelines.md) | Custom hooks, data fetching patterns | To fill |
-| [State Management](./state-management.md) | Local state, global state, server state | To fill |
+| [Directory Structure](./directory-structure.md) | WXT entrypoints + lib layout, adapter organization | Filled |
+| [Component Guidelines](./component-guidelines.md) | Platform adapter contract, pipeline reuse, fallback, MAIN-world bridge | Filled |
+| [Hook Guidelines](./hook-guidelines.md) | (n/a — no React hooks in this project) | To fill |
+| [State Management](./state-management.md) | Cross-layer EXTRACT/CAPTURE message contract, RawCapture | Filled |
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
 | [Type Safety](./type-safety.md) | Type patterns, validation | To fill |
 
