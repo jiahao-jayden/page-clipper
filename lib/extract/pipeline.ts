@@ -3,6 +3,7 @@ import type { DefuddleResponse } from 'defuddle'
 import TurndownService from 'turndown'
 import { gfm } from 'turndown-plugin-gfm'
 import type { RawCapture } from '../normalize'
+import { hostToPlatform } from '../platform'
 
 /** 把可能是相对路径的 URL 补全为绝对 URL。失败时原样返回。 */
 function absolutize(url: string, base: string): string {
@@ -98,18 +99,6 @@ export async function defuddleExtract(url: string): Promise<DefuddleExtractResul
 
   const markdown = response.content ? htmlToMarkdown(response.content, url) : ''
   return { markdown, response }
-}
-
-/** 按 hostname 粗分类平台名（defuddle 未命中专门 extractor 时的兜底）。 */
-export function hostToPlatform(host: string): string {
-  if (host.includes('reddit.com')) return 'reddit'
-  if (host.includes('medium.com')) return 'medium'
-  if (host.includes('github.com')) return 'github'
-  if (host.includes('youtube.com') || host.includes('youtu.be')) return 'youtube'
-  if (host.includes('news.ycombinator.com')) return 'hackernews'
-  if (host.includes('bilibili.com')) return 'bilibili'
-  if (host.includes('x.com') || host.includes('twitter.com')) return 'x'
-  return 'article'
 }
 
 /** defuddle extractorType → 我们的 source_platform 命名归一。 */

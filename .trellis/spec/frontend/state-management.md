@@ -59,7 +59,7 @@ update this file.
 
 ### 6. Tests Required
 
-No automated tests in repo; `pnpm exec tsc --noEmit` + `pnpm build` are the gate.
+No automated tests in repo; `bun x tsc --noEmit` + `bun run build` are the gate.
 Manual assertion points: preview bytes == written bytes; note edits don't trigger
 re-extract; `captured_at` is fixed once per popup open (preview == file).
 

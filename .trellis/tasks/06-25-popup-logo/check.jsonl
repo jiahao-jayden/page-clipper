@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec index for verifying popup UI and shared platform utility work."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Verify new shared code follows the WXT entrypoints/lib layout conventions."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify extraction pipeline boundaries and adapter reuse remain clean."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify RawCapture and runtime message contract behavior stays compatible."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Quality checklist for review, lint, and type-check expectations."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify type-safe handling of platform inference and fallback states."}

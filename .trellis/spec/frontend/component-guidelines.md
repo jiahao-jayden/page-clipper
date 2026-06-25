@@ -2,8 +2,9 @@
 
 > How extraction adapters and the popup are built in this project.
 
-This project has no UI component framework. The reusable "component" here is the
-**platform adapter**. This file is the contract for adding/maintaining one.
+The popup uses React + shadcn-style UI primitives, but the most important reusable
+"component" in extraction code is still the **platform adapter**. This file is the
+contract for adding/maintaining adapter behavior and popup-facing platform identity.
 
 ---
 
@@ -120,3 +121,25 @@ requests; for 站点 with open endpoints used by `defuddle` (B站 `player/v2`), 
 Clean light UI: white background, neutral greys, thin rounded borders, system font.
 Popup auto-extracts on open, renders a scrollable markdown preview, and a copy
 button — keep it minimal, no flashy styling.
+
+### Convention: popup platform identity stays lightweight
+
+**What**: Popup UI may need fast platform identity before extraction completes
+(logo, display label, fallback hostname). Put shared host/platform helpers in a
+lightweight module such as `lib/platform.ts`.
+
+**Why**: The popup should not import `lib/extract/pipeline.ts` or adapters just to
+reuse host detection. Pipeline/adapters bring extraction dependencies and page-DOM
+concerns into the popup bundle.
+
+```typescript
+// Good: shared, dependency-light helper
+import { faviconUrlForHost, hostToPlatform, platformDisplayName } from '@/lib/platform'
+
+// Bad: pulls extraction pipeline into popup UI
+import { hostToPlatform } from '@/lib/extract/pipeline'
+```
+
+**Host matching rule**: match exact hostnames or subdomains only. Avoid broad
+`includes()` checks because domains like `notgithub.com` must not resolve as
+GitHub.

@@ -1,0 +1,6 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec index for popup UI and shared platform utility work."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Guides where WXT entrypoints and shared lightweight lib code should live."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Documents adapter and pipeline reuse boundaries so popup does not import heavy extraction code."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Defines RawCapture and cross-layer EXTRACT/CAPTURE message contracts used by the popup."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "General frontend quality expectations for implementation."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Type safety expectations for platform inference and popup state."}

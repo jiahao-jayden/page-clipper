@@ -1,6 +1,15 @@
-import { defineConfig } from 'wxt'
+import { defineConfig, type WxtViteConfig } from 'wxt'
+import { fileURLToPath } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  modules: ['@wxt-dev/module-react'],
+  alias: {
+    '@': fileURLToPath(new URL('.', import.meta.url)),
+  },
+  vite: () => ({
+    plugins: [tailwindcss()],
+  } as WxtViteConfig),
   manifest: {
     name: 'Obsidian Wiki Clipper',
     version: '0.1.0',

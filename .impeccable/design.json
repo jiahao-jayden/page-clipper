@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-25T07:34:30Z",
+  "title": "Design System: Obsidian Wiki Clipper",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Workbench Surface",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "oklch(0.15 0 0)",
+          "oklch(0.25 0 0)",
+          "oklch(0.38 0 0)",
+          "oklch(0.52 0 0)",
+          "oklch(0.68 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.94 0 0)",
+          "oklch(1 0 0)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Workbench Ink",
+        "canonical": "oklch(0.145 0 0)",
+        "tonalRamp": [
+          "oklch(0.145 0 0)",
+          "oklch(0.205 0 0)",
+          "oklch(0.32 0 0)",
+          "oklch(0.45 0 0)",
+          "oklch(0.56 0 0)",
+          "oklch(0.71 0 0)",
+          "oklch(0.92 0 0)",
+          "oklch(0.985 0 0)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Action Ink",
+        "canonical": "oklch(0.205 0 0)",
+        "tonalRamp": [
+          "oklch(0.15 0 0)",
+          "oklch(0.205 0 0)",
+          "oklch(0.32 0 0)",
+          "oklch(0.45 0 0)",
+          "oklch(0.56 0 0)",
+          "oklch(0.71 0 0)",
+          "oklch(0.92 0 0)",
+          "oklch(0.985 0 0)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Soft Layer",
+        "canonical": "oklch(0.97 0 0)",
+        "tonalRamp": [
+          "oklch(0.20 0 0)",
+          "oklch(0.32 0 0)",
+          "oklch(0.44 0 0)",
+          "oklch(0.56 0 0)",
+          "oklch(0.70 0 0)",
+          "oklch(0.84 0 0)",
+          "oklch(0.92 0 0)",
+          "oklch(0.97 0 0)"
+        ]
+      },
+      "destructive": {
+        "role": "primary",
+        "displayName": "Error Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.24 0.12 27.325)",
+          "oklch(0.34 0.16 27.325)",
+          "oklch(0.46 0.21 27.325)",
+          "oklch(0.577 0.245 27.325)",
+          "oklch(0.68 0.20 27.325)",
+          "oklch(0.78 0.14 27.325)",
+          "oklch(0.88 0.08 27.325)",
+          "oklch(0.95 0.035 27.325)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Popup title and compact section hierarchy."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Controls, messages, and general product copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Small section labels and metadata markers."
+      },
+      "mono": {
+        "displayName": "Markdown Preview",
+        "purpose": "Only for extracted Markdown preview and code-like content."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-xs",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Tiny structural lift for outline controls and fields."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms-250ms ease-out",
+        "purpose": "Short feedback for hover, focus, loading, and status changes."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "popup-width",
+        "value": "420px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact primary action for clipping.",
+      "html": "<button class=\"ds-btn-primary\">剪藏</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 0; border-radius: 8px; background: var(--primary, oklch(0.205 0 0)); color: var(--primary-foreground, oklch(0.985 0 0)); font: 500 14px/1.2 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; white-space: nowrap; transition: background-color 180ms ease-out, box-shadow 180ms ease-out; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--primary, oklch(0.205 0 0)) 90%, transparent); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-btn-primary:disabled { pointer-events: none; opacity: 0.5; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action for copy or alternate workflows.",
+      "html": "<button class=\"ds-btn-outline\">复制 Markdown</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; border: 1px solid var(--border, oklch(0.922 0 0)); border-radius: 8px; background: var(--background, oklch(1 0 0)); color: var(--foreground, oklch(0.145 0 0)); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); font: 500 14px/1.2 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; white-space: nowrap; transition: background-color 180ms ease-out, color 180ms ease-out, box-shadow 180ms ease-out; } .ds-btn-outline:hover { background: var(--accent, oklch(0.97 0 0)); color: var(--accent-foreground, oklch(0.205 0 0)); } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-btn-outline:disabled { pointer-events: none; opacity: 0.5; }"
+    },
+    {
+      "name": "Source Badge",
+      "kind": "chip",
+      "refersTo": "badge-secondary",
+      "description": "Compact metadata label for the detected source platform.",
+      "html": "<span class=\"ds-source-badge\">article</span>",
+      "css": ".ds-source-badge { display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: fit-content; max-width: 100%; overflow: hidden; border: 1px solid transparent; border-radius: 999px; background: var(--secondary, oklch(0.97 0 0)); color: var(--secondary-foreground, oklch(0.205 0 0)); padding: 2px 8px; font: 400 12px/1.2 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; white-space: nowrap; } .ds-source-badge:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); }"
+    },
+    {
+      "name": "Textarea",
+      "kind": "input",
+      "refersTo": "textarea",
+      "description": "Compact note field with clear focus treatment.",
+      "html": "<textarea class=\"ds-textarea\" placeholder=\"备注（可选，会写入 frontmatter）\"></textarea>",
+      "css": ".ds-textarea { display: flex; min-height: 56px; width: 100%; resize: vertical; border: 1px solid var(--input, oklch(0.922 0 0)); border-radius: 8px; background: transparent; color: var(--foreground, oklch(0.145 0 0)); padding: 8px 12px; font: 400 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 180ms ease-out, box-shadow 180ms ease-out; } .ds-textarea::placeholder { color: var(--muted-foreground, oklch(0.556 0 0)); } .ds-textarea:focus-visible { outline: none; border-color: var(--ring, oklch(0.708 0 0)); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, oklch(0.708 0 0)) 50%, transparent); } .ds-textarea:disabled { cursor: not-allowed; opacity: 0.5; }"
+    },
+    {
+      "name": "Markdown Preview",
+      "kind": "card",
+      "refersTo": "preview-container",
+      "description": "Scrollable monospace preview block that leads the popup.",
+      "html": "<div class=\"ds-markdown-preview\"># Captured title\\n\\nExtracted Markdown preview...</div>",
+      "css": ".ds-markdown-preview { height: 240px; overflow: auto; border: 1px solid var(--border, oklch(0.922 0 0)); border-radius: 10px; background: color-mix(in oklch, var(--muted, oklch(0.97 0 0)) 40%, transparent); color: var(--foreground, oklch(0.145 0 0)); padding: 12px; font: 400 12px/1.625 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Quiet Workbench",
+    "overview": "This system is a compact work surface for clipping knowledge. It should feel calm, precise, and restrained: a place where the user can inspect Markdown, add a note, and send the result onward without visual noise. The visual language is intentionally familiar. It uses neutral surfaces, small type, clear borders, modest radii, and standard product controls.",
+    "keyCharacteristics": [
+      "Dense enough for repeated popup use.",
+      "Neutral-first, with color reserved for state and primary action.",
+      "Border and tonal layers before shadow.",
+      "Familiar controls with visible hover, focus, disabled, loading, and error states.",
+      "Text preview is the hero; chrome stays quiet."
+    ],
+    "rules": [
+      {
+        "name": "The Rarity Rule",
+        "body": "Primary ink is for the action that matters now. Do not spend it on decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Neutral Honesty Rule",
+        "body": "Gray roles must stay functional: surface, border, muted copy, focus, or state. No ornamental gray gradients.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Display Drama Rule",
+        "body": "Product UI labels never use display typography, oversized headings, or decorative font pairings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Preview Leads Rule",
+        "body": "Monospace belongs to the Markdown preview, not to the whole product. Do not let it turn the interface into terminal styling.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Workbench Rule",
+        "body": "Surfaces rest flat. If a shadow becomes visually noticeable before interaction, it is probably too much.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the popup dense and task-first; the Markdown preview is the primary content.",
+      "Do use the neutral tokens from `assets/tailwind.css` instead of inventing new grays.",
+      "Do reserve Action Ink for primary action, active emphasis, and essential state.",
+      "Do show status with text and iconography, not color alone.",
+      "Do keep motion to state feedback between `150ms` and `250ms`, with reduced-motion alternatives."
+    ],
+    "donts": [
+      "Don't make this look like a SaaS marketing surface with gradients, inflated cards, hero metrics, or decorative motion.",
+      "Don't over-mimic Obsidian with a heavy plugin aesthetic or unnecessary darkness.",
+      "Don't introduce terminal or hacker styling; monospace is for Markdown preview only.",
+      "Don't add glassmorphism, colored side-stripe borders, gradient text, or oversized rounded cards.",
+      "Don't use shadow as atmosphere. If a card needs structure, use border and tonal fill first."
+    ]
+  }
+}
