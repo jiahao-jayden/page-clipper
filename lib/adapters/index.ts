@@ -2,6 +2,8 @@ import type { RawCapture } from '../normalize'
 import * as twitter from './twitter'
 import * as zhihu from './zhihu'
 import * as wechat from './wechat'
+import * as weibo from './weibo'
+import * as xiaohongshu from './xiaohongshu'
 import * as generic from './generic'
 
 export interface Adapter {
@@ -18,10 +20,15 @@ export interface Adapter {
  * 都不命中时回退到 generic（defuddle 通用提取）。
  * 专门 adapter 排在前面，generic 永远兜底放最后。
  */
+// 注：B站不单列 adapter——defuddle 内置的 bilibili extractor 已完整抓取字幕
+// （view→player/v2→subtitle_url），故视频页直接走 generic(defuddle) 即可，
+// 仅需在 wxt.config.ts 放开 api.bilibili.com / *.hdslb.com 的 host_permissions。
 const adapters: Adapter[] = [
   { name: 'twitter', matches: twitter.matches, extract: twitter.extract },
   { name: 'zhihu', matches: zhihu.matches, extract: zhihu.extract },
   { name: 'wechat', matches: wechat.matches, extract: wechat.extract },
+  { name: 'weibo', matches: weibo.matches, extract: weibo.extract },
+  { name: 'xiaohongshu', matches: xiaohongshu.matches, extract: xiaohongshu.extract },
   { name: 'generic', matches: generic.matches, extract: generic.extract },
 ]
 
