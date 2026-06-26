@@ -41,3 +41,36 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: 剪藏标签支持
+
+**Date**: 2026-06-26
+**Task**: 剪藏标签支持
+**Branch**: `main`
+
+### Summary
+
+实现剪藏时添加用户标签、复用本地标签历史，并补齐标签相关设计/计划与前端状态契约。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `32f7616` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
