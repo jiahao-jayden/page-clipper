@@ -106,6 +106,7 @@ function buildCapture(url: string, note: XhsNote): RawCapture {
     outbound_urls: [],
     user_note: '',
     tags: [],
+    og_image: '',
   }
 }
 
