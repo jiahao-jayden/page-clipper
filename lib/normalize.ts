@@ -1,3 +1,5 @@
+import { normalizeTags } from './tags'
+
 export interface RawCapture {
   source_platform: string
   source_id: string
@@ -9,9 +11,16 @@ export interface RawCapture {
   outbound_urls: string[]
   user_note: string
   tags: string[]
+  og_image: string
 }
 
 export function toMarkdown(c: RawCapture): string {
+  const tags = normalizeTags([
+    'status/captured',
+    `source/${c.source_platform}`,
+    ...c.tags,
+  ])
+
   return `---
 source_platform: ${c.source_platform}
 source_id: "${c.source_id}"
@@ -21,7 +30,7 @@ author: ${c.author}
 captured_at: ${c.captured_at}
 outbound_urls: ${JSON.stringify(c.outbound_urls)}
 user_note: "${c.user_note}"
-tags: [status/captured, source/${c.source_platform}]
+tags: ${JSON.stringify(tags)}${c.og_image ? `\nog_image: ${c.og_image}` : ''}
 ---
 
 ${c.raw_text}

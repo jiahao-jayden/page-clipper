@@ -1,5 +1,5 @@
 ---
-name: Obsidian Wiki Clipper
+name: Wiki Clipper
 description: A calm, precise clipping tool for moving web content into a knowledge base.
 colors:
   background: "oklch(1 0 0)"
@@ -74,7 +74,7 @@ components:
     padding: "8px 12px"
 ---
 
-# Design System: Obsidian Wiki Clipper
+# Design System: Wiki Clipper
 
 ## 1. Overview
 

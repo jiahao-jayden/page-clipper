@@ -51,5 +51,6 @@ function fallbackExtract(url: string, source_id: string, author: string): RawCap
     outbound_urls: [...new Set(outbound_urls)],
     user_note: '',
     tags: [],
+    og_image: '',
   }
 }

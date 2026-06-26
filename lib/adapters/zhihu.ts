@@ -51,6 +51,7 @@ export async function extract(url: string): Promise<RawCapture> {
     outbound_urls: [],
     user_note: '',
     tags: [],
+    og_image: '',
   }
 }
 

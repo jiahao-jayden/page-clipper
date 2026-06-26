@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Quality check should verify the frontend pre-development checklist was respected."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Review WXT entrypoint and config file placement for the settings page."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Review popup/options UI consistency with existing React patterns."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Review runtime settings and vault write behavior against cross-layer contracts."}

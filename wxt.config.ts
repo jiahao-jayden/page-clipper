@@ -11,13 +11,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
   } as WxtViteConfig),
   manifest: {
-    name: 'Obsidian Wiki Clipper',
+    name: 'Wiki Clipper',
     version: '0.1.0',
     description: '剪藏网页内容到 Obsidian wiki',
-    permissions: ['activeTab', 'tabs'],
+    permissions: ['activeTab', 'tabs', 'storage'],
     host_permissions: [
-      'http://localhost:27123/*',
-      'http://127.0.0.1:27123/*',
+      'http://localhost/*',
+      'http://127.0.0.1/*',
+      'https://localhost/*',
+      'https://127.0.0.1/*',
       // B站字幕：defuddle 的 bilibili extractor 在 content script 内 fetch 这些域
       // （view→player/v2→subtitle_url，credentials:'include'），需放开跨域。
       '*://api.bilibili.com/*',

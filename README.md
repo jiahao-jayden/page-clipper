@@ -1,4 +1,4 @@
-# Obsidian Wiki Clipper
+# Wiki Clipper
 
 剪藏网页内容到 Obsidian wiki 的 `_raw/bookmarks/`，输出规范字段。
 
@@ -12,7 +12,7 @@
 
 1. Obsidian 装并启用 **Local REST API** 插件
 2. 在插件设置里拿到 API key（如启用了鉴权）
-3. 把 key 填进 `.env.local` 的 `VITE_OBSIDIAN_REST_KEY`
+3. 在扩展的设置页（popup 右上角设置图标，或扩展 options 入口）填写 Obsidian REST URL、密钥，并可选配置保存基础目录与路径模板
 
 ## 开发
 

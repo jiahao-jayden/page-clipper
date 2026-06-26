@@ -1,13 +1,14 @@
-const BASE = import.meta.env.VITE_OBSIDIAN_REST_URL ?? 'http://localhost:27123'
-const KEY  = import.meta.env.VITE_OBSIDIAN_REST_KEY  ?? ''
+import { normalizeSettings, vaultRequestHeaders, type ClipperSettings } from '@/lib/settings'
 
-export async function writeRaw(path: string, content: string): Promise<void> {
-  const res = await fetch(`${BASE}/vault/${path}`, {
+export async function writeRaw(
+  path: string,
+  content: string,
+  settings: ClipperSettings,
+): Promise<void> {
+  const normalized = normalizeSettings(settings)
+  const res = await fetch(`${normalized.restUrl}/vault/${path}`, {
     method: 'PUT',
-    headers: {
-      ...(KEY ? { Authorization: `Bearer ${KEY}` } : {}),
-      'Content-Type': 'text/markdown',
-    },
+    headers: vaultRequestHeaders(normalized),
     body: content,
   })
   if (!res.ok) throw new Error(`Vault write failed: ${res.status} ${await res.text()}`)

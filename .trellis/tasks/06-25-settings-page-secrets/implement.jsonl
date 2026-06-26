@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec index for pre-development checklist and relevant guideline discovery."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Settings page adds/changes WXT entrypoints and runtime config placement."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Popup/options UI should follow existing React component and adapter boundary conventions."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Runtime settings affect popup-background message flow, storage, and vault write contract."}

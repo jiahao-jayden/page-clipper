@@ -20,7 +20,7 @@ update this file.
 ```typescript
 // popup → background
 { type: 'EXTRACT' }                       // returns { ok, data?: RawCapture, error? }
-{ type: 'CAPTURE', data: RawCapture, note: string } // returns { ok, path?, error? }
+{ type: 'CAPTURE', data: RawCapture, note: string, tags: string[] } // returns { ok, path?, error? }
 
 // background → content (forwarded)
 { type: 'EXTRACT' }                       // content returns { ok, data?: RawCapture, error? }
@@ -33,12 +33,54 @@ update this file.
   raw_text, outbound_urls[], user_note, tags[]`.
 - **EXTRACT** runs adapter routing in the content script and returns a `RawCapture`
   with `user_note: ''`. It does **not** write anything.
-- **CAPTURE** receives the *already-extracted* `data` + `note` and writes to the
-  vault. It must **not** re-extract.
-- Write path (unchanged contract):
-  `_raw/bookmarks/{source_platform}/{captured_at date}-{slug(source_id||canonical_url)}.md`
-- Env keys (build-time, `import.meta.env`): `VITE_OBSIDIAN_REST_URL`
-  (default `http://localhost:27123`), `VITE_OBSIDIAN_REST_KEY` (optional Bearer).
+- **CAPTURE** receives the *already-extracted* `data` + `note` + selected `tags`
+  and writes via the **active connector** (`saveWithActiveConnector` in
+  `lib/connectors`). It must **not** re-extract and must **not** call
+  Obsidian/`vault.ts` directly — it dispatches through the connector registry so
+  future save targets need no background change. The background applies
+  `user_note` and normalized `tags` to the final `RawCapture` before saving.
+- Tag history lives separately in `chrome.storage.local` under
+  `obsidianWikiClipper.tags.v1`; do not mix it into connector settings. The popup
+  updates this history only after a successful save, so failed clips do not add
+  draft tags to future suggestions.
+- Runtime config lives in `chrome.storage.local` under
+  `obsidianWikiClipper.settings.v1` as a **connector config object**:
+  `{ activeConnector: string, connectors: Record<string, Record<string,string>> }`.
+  Each connector owns its own flat string config (the Obsidian connector's config
+  is `restUrl`, `restToken`, `saveBaseDir`, `pathTemplate`).
+- **Migration / back-compat**: `migrateConfig` (in `lib/settings.ts`) reads the
+  same key with fallback. Old builds stored *flat* Obsidian settings
+  (`{ restUrl, restToken, saveBaseDir, pathTemplate }`) under this key; they are
+  wrapped into `{ activeConnector: 'obsidian', connectors: { obsidian: <flat> } }`
+  so previously saved settings are never dropped. The storage key is unchanged.
+- Default save config preserves the old write path:
+  base `_raw/bookmarks`, template `{platform}/{date}-{slug}.md`.
+- Path template MVP variables: `{platform}`, `{date}`, `{slug}`.
+- REST URL/token are configured in the options page at runtime; do not depend on
+  build-time `import.meta.env` secrets.
+
+### Connector contract
+
+```typescript
+// lib/connectors/types.ts
+export interface Connector {
+  id: string
+  name: string
+  fields: ConnectorField[]                         // options-page form schema
+  defaultConfig: ConnectorConfig                   // Record<string,string>
+  normalizeConfig(config: ConnectorConfig | undefined): ConnectorConfig
+  validateConfig(config: ConnectorConfig): string | null   // null = valid
+  testConnection(config: ConnectorConfig): Promise<void>
+  save(capture: RawCapture, config: ConnectorConfig): Promise<{ path: string }>
+}
+```
+
+- Register connectors in the `REGISTRY` array in `lib/connectors/index.ts`. The
+  options page enumerates them via `listConnectors()`; background resolves the
+  active one via `resolveConnector` / `saveWithActiveConnector`.
+- The popup validates the *active connector* via `validateActiveConnector()`
+  (replaces the old `validateSettings(getSettings())`), blocking clip + showing
+  the "去设置" entry on missing config or failed connection (`needsSettings`).
 
 ### 4. Validation & Error Matrix
 
@@ -48,11 +90,13 @@ update this file.
 | Content script not ready | `{ ok:false, error:'…reload the page and try again' }` (do not throw) |
 | Adapter throws | Should not happen — adapters fall back to `generic` (see component-guidelines) |
 | Vault PUT non-2xx | `writeRaw` throws `Vault write failed: <status>` → surfaced as `{ ok:false }` |
+| Missing REST URL/token or failed connection test | popup blocks clipping and links to options page |
 
 ### 5. Good/Base/Bad Cases
 
-- **Good**: open popup → EXTRACT returns RawCapture → preview shows full markdown →
-  edit note (local re-render, no re-extract) → CAPTURE writes once.
+- **Good**: configure options → open popup → EXTRACT returns RawCapture → preview
+  shows full markdown → edit note (local re-render, no re-extract) → CAPTURE uses
+  the stored REST config and path template to write once.
 - **Base**: unknown site → `generic` (defuddle) extracts → still previews/saves.
 - **Bad**: login-walled page → adapter falls back, preview shows minimal capture
   (title + URL); user still can save.
@@ -61,7 +105,8 @@ update this file.
 
 No automated tests in repo; `bun x tsc --noEmit` + `bun run build` are the gate.
 Manual assertion points: preview bytes == written bytes; note edits don't trigger
-re-extract; `captured_at` is fixed once per popup open (preview == file).
+re-extract; `captured_at` is fixed once per popup open (preview == file); default
+save settings still produce `_raw/bookmarks/{platform}/{date}-{slug}.md`.
 
 ### 7. Wrong vs Correct
 
@@ -73,10 +118,11 @@ case 'CAPTURE': { const data = await extract(); writeRaw(toMarkdown({...data, no
 
 #### Correct
 ```typescript
-// popup extracts once, builds preview locally, sends the SAME data to CAPTURE
+// popup extracts once, builds preview locally, sends the SAME data + selected tags to CAPTURE
 const data = (await send({ type: 'EXTRACT' })).data
-preview.value = toMarkdown({ ...data, user_note: note }) // single source of truth
-await send({ type: 'CAPTURE', data, note })
+const tags = normalizeTags(selectedTags)
+preview.value = toMarkdown({ ...data, user_note: note, tags }) // single source of truth
+await send({ type: 'CAPTURE', data, note, tags })
 ```
 
 **Single source of truth**: both preview and write go through

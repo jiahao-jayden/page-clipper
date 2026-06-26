@@ -138,6 +138,7 @@ export function captureFromDefuddle(
     outbound_urls: [],
     user_note: '',
     tags: [],
+    og_image: response.image || '',
   }
 
   return { ...base, ...overrides }

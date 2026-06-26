@@ -10,7 +10,7 @@ Heavy knowledge-base users who clip web pages into a durable personal or team kn
 
 ## Product Purpose
 
-Obsidian Wiki Clipper extracts the active page, normalizes it into readable Markdown, lets the user review or annotate it, and saves it into a knowledge-base destination. Success means clipping feels quick, trustworthy, and low-friction: the user can understand what will be saved, make a small adjustment when needed, and move on.
+Wiki Clipper extracts the active page, normalizes it into readable Markdown, lets the user review or annotate it, and saves it into a knowledge-base destination. Success means clipping feels quick, trustworthy, and low-friction: the user can understand what will be saved, make a small adjustment when needed, and move on.
 
 ## Brand Personality
 
