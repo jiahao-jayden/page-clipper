@@ -1,7 +1,9 @@
-import { CheckCircle2, Loader2, RotateCcw } from 'lucide-react'
+import { Check, ChevronDown, Loader2, PlugZap, RotateCcw } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
+import { StatusNotice, type StatusKind } from '@/components/status-notice'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   getRawConfig,
   listConnectors,
@@ -9,8 +11,6 @@ import {
   type ConnectorConfig,
 } from '@/lib/connectors'
 import { DEFAULT_CONNECTOR_ID, type ClipperConfig } from '@/lib/settings'
-
-type StatusKind = 'idle' | 'muted' | 'ok' | 'err'
 
 interface StatusState {
   text: string
@@ -68,13 +68,6 @@ export default function App() {
 
   const connectionFields = connector.fields.filter((f) => f.group === 'connection')
   const pathFields = connector.fields.filter((f) => f.group === 'path')
-
-  const statusClass =
-    status.kind === 'ok'
-      ? 'border-primary/30 bg-primary/5 text-primary'
-      : status.kind === 'err'
-        ? 'border-red-200 bg-red-50/80 text-destructive'
-        : 'border-border bg-muted text-muted-foreground'
 
   function clearStatus() {
     if (status.kind !== 'idle') setStatus({ text: '', kind: 'idle' })
@@ -148,62 +141,93 @@ export default function App() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-10">
-      <section className="rounded-2xl border border-border bg-background p-6 shadow-sm">
-        <header className="mb-6 border-b border-border pb-4">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Wiki Clipper
+    <div className="min-h-screen">
+      <header className="border-b border-border bg-background">
+        <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-2.5 px-6">
+          <img src="/icon-128.png" alt="" className="size-7 rounded-md ring-1 ring-border" />
+          <span className="text-sm font-semibold tracking-tight">Wiki Clipper</span>
+          <span className="text-sm text-muted-foreground">/</span>
+          <span className="text-sm text-muted-foreground">设置</span>
+        </div>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 py-8">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">剪藏设置</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            选择保存目标，并配置连接信息与剪藏文件的保存路径。
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">设置</h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            选择保存目标，并配置其连接信息与剪藏文件保存路径。
-          </p>
-        </header>
+        </div>
 
         {loading ? (
-          <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-8 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
             正在读取设置…
           </div>
         ) : (
-          <div className="flex flex-col gap-5">
-            <Field id="connector" label="保存目标" hint="未来将支持更多目标（如 Notion）。">
-              <select
-                id="connector"
-                value={connector.id}
-                onChange={(e) => selectConnector(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-              >
-                {CONNECTORS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            {connectionFields.map((field) => (
-              <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
-                <input
-                  id={field.key}
-                  type={field.type === 'password' ? 'password' : 'text'}
-                  value={connectorConfig[field.key] ?? ''}
-                  onChange={(e) => updateField(field.key, e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  placeholder={field.placeholder}
-                />
+          <>
+            <Section title="保存目标" description="剪藏内容将写入这里。未来会支持更多目标（如 Notion）。">
+              <Field id="connector" label="目标应用">
+                <div className="relative">
+                  <select
+                    id="connector"
+                    value={connector.id}
+                    onChange={(e) => selectConnector(e.target.value)}
+                    className="h-9 w-full appearance-none rounded-md border border-input bg-background pr-9 pl-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40"
+                  >
+                    {CONNECTORS.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </Field>
-            ))}
+            </Section>
+
+            {connectionFields.length > 0 && (
+              <Section
+                title="连接"
+                description={`${connector.name} 的访问地址与凭据，仅保存在本机浏览器中。`}
+                action={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTestConnection}
+                    disabled={saving || testing}
+                  >
+                    {testing ? <Loader2 className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
+                    测试连接
+                  </Button>
+                }
+              >
+                {connectionFields.map((field) => (
+                  <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
+                    <Input
+                      id={field.key}
+                      type={field.type === 'password' ? 'password' : 'text'}
+                      value={connectorConfig[field.key] ?? ''}
+                      onChange={(e) => updateField(field.key, e.target.value)}
+                      placeholder={field.placeholder}
+                      spellCheck={false}
+                      autoComplete="off"
+                    />
+                  </Field>
+                ))}
+              </Section>
+            )}
 
             {pathFields.length > 0 && (
-              <div className="rounded-xl border border-border bg-muted/30 p-4">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-medium">保存路径</h2>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      支持变量：{'{platform}'}、{'{date}'}、{'{slug}'}。
-                    </p>
-                  </div>
+              <Section
+                title="保存路径"
+                description={
+                  <>
+                    支持变量 <Code>{'{platform}'}</Code> <Code>{'{date}'}</Code> <Code>{'{slug}'}</Code>
+                  </>
+                }
+                action={
                   <Button
                     type="button"
                     variant="ghost"
@@ -214,53 +238,75 @@ export default function App() {
                     <RotateCcw className="size-4" />
                     恢复默认
                   </Button>
-                </div>
-
+                }
+              >
                 <div className="grid gap-4 sm:grid-cols-2">
                   {pathFields.map((field) => (
                     <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
-                      <input
+                      <Input
                         id={field.key}
                         value={connectorConfig[field.key] ?? ''}
                         onChange={(e) => updateField(field.key, e.target.value)}
-                        className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                         placeholder={field.placeholder}
+                        spellCheck={false}
+                        className="font-mono text-[13px]"
                       />
                     </Field>
                   ))}
                 </div>
+                <div className="flex items-baseline gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
+                  <span className="shrink-0 text-muted-foreground">示例</span>
+                  <span className="truncate font-mono text-foreground/80">
+                    _raw/bookmarks/x/2026-06-25-example.md
+                  </span>
+                </div>
+              </Section>
+            )}
 
-                <p className="mt-3 rounded-md bg-background px-3 py-2 font-mono text-xs text-muted-foreground">
-                  默认效果：_raw/bookmarks/x/2026-06-25-example.md
-                </p>
+            <div className="flex flex-col gap-3">
+              {status.text && status.kind !== 'idle' && (
+                <StatusNotice kind={status.kind} className="animate-in fade-in duration-150">
+                  {status.text}
+                </StatusNotice>
+              )}
+              <div className="flex justify-end">
+                <Button type="button" onClick={handleSave} disabled={saving || testing}>
+                  {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+                  保存设置
+                </Button>
               </div>
-            )}
-
-            <div className="flex flex-wrap gap-2 border-t border-border pt-4">
-              <Button type="button" onClick={handleSave} disabled={saving || testing}>
-                {saving ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
-                保存设置
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleTestConnection}
-                disabled={saving || testing}
-              >
-                {testing && <Loader2 className="size-4 animate-spin" />}
-                测试连接
-              </Button>
             </div>
-
-            {status.text && (
-              <p className={`rounded-lg border px-3 py-2 text-sm ${statusClass}`}>
-                {status.text}
-              </p>
-            )}
-          </div>
+          </>
         )}
-      </section>
-    </main>
+      </main>
+    </div>
+  )
+}
+
+function Section({
+  title,
+  description,
+  action,
+  children,
+}: {
+  title: string
+  description?: ReactNode
+  action?: ReactNode
+  children: ReactNode
+}) {
+  return (
+    <section className="rounded-xl border border-border bg-card">
+      <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold">{title}</h2>
+          {description && (
+            <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{description}</p>
+          )}
+        </div>
+        {action && <div className="shrink-0">{action}</div>}
+      </div>
+      <div className="flex flex-col gap-4 px-5 py-5">{children}</div>
+    </section>
   )
 }
 
@@ -277,11 +323,19 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium">
+      <label htmlFor={id} className="text-[13px] font-medium">
         {label}
       </label>
       {children}
-      {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
+      {hint && <span className="text-xs leading-5 text-muted-foreground">{hint}</span>}
     </div>
+  )
+}
+
+function Code({ children }: { children: ReactNode }) {
+  return (
+    <code className="rounded bg-muted px-1 py-0.5 font-mono text-[12px] text-foreground/80">
+      {children}
+    </code>
   )
 }

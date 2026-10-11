@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec index for quality check context."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Verify WXT public icon asset conventions."}
+{"file": "PRODUCT.md", "reason": "Verify brand personality is preserved."}
+{"file": "DESIGN.md", "reason": "Verify Sage Tail asset fits existing design system."}

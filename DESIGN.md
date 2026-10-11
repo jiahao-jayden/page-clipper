@@ -93,6 +93,10 @@ It explicitly rejects SaaS marketing polish, heavy Obsidian cosplay, unnecessary
 - Familiar controls with visible hover, focus, disabled, loading, and error states.
 - Text preview is the hero; chrome stays quiet.
 
+### Brand Symbol
+
+The extension icon uses the "鼠尾巴 / Sage Tail" image: a quiet, precise clipping symbol that lightly curls knowledge into the user's vault. Treat it as a restrained brand mark only. Do not expand it into mascot-driven popup UI, decorative illustration, or new motion patterns.
+
 ## 2. Colors
 
 The palette is Functional Sage: a restrained sage green brand hue (OKLCH hue 145) tints the primary action and subtly warms the neutral scale, while the interface remains predominantly white and gray. Accent usage stays under 10% of surface area. Destructive red is reserved for errors.

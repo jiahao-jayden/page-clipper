@@ -122,6 +122,18 @@ Clean light UI: white background, neutral greys, thin rounded borders, system fo
 Popup auto-extracts on open, renders a scrollable markdown preview, and a copy
 button — keep it minimal, no flashy styling.
 
+Layout (popup, fixed 420×600): brand header → source card (cover/favicon, title,
+platform · author · host) → body preview (only scrolling region; frontmatter
+collapsed behind a toggle) → note → tags → footer actions. Toasts float above
+the footer and never change layout height.
+
+### Convention: shared form & status primitives
+
+- Text fields use `components/ui/input.tsx` (`Input`) on both popup and options
+  page; don't hand-roll input class strings.
+- Status/error feedback uses `components/status-notice.tsx` (`StatusNotice`),
+  which pairs an icon with the text. Don't prefix messages with `✓` / `✗`.
+
 ### Convention: popup platform identity stays lightweight
 
 **What**: Popup UI may need fast platform identity before extraction completes
