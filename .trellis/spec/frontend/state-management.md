@@ -86,8 +86,17 @@ export interface Connector {
   the active connector, blocking save + showing the "去设置" entry on missing
   config (`needsSettings`). Background `CAPTURE` re-checks `enabled` and refuses
   to write when off (`{ ok:false, error:'<name> 导入未开启', needsSettings:true }`).
-- Turning export off in options saves `exportEnabled:false` without validating
-  or clearing connector config, so re-enabling needs no re-entry.
+- The export Switch in options auto-saves immediately on toggle: it re-reads
+  the freshly stored config (`getRawConfig()`), writes back only `exportEnabled`
+  (on or off) via `saveRawConfig`, and never touches/persists unsaved
+  connector/path form edits or runs connector validation. The Switch is
+  disabled while this write (and while "保存设置" is saving) is in flight to
+  avoid overlapping writes; a failed toggle write rolls the Switch back via a
+  functional `setState` update, so it can't clobber other edits made meanwhile.
+  Turning export off keeps connector config in storage untouched, so
+  re-enabling needs no re-entry. The "保存设置" button (only rendered when
+  export is enabled) is the one that validates and persists connector/path
+  field edits, always writing `exportEnabled:true` alongside them.
 - Storage keys keep the legacy `obsidianWikiClipper.*` prefix after the Page
   Clipper rename — renaming them would drop users' saved config.
 

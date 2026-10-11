@@ -40,9 +40,11 @@ export default function App() {
     exportEnabled: false,
   }))
   const [status, setStatus] = useState<StatusState>({ text: '', kind: 'idle' })
+  const [switchStatus, setSwitchStatus] = useState<StatusState>({ text: '', kind: 'idle' })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
+  const [switchSaving, setSwitchSaving] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -92,9 +94,36 @@ export default function App() {
     clearStatus()
   }
 
-  function setExportEnabled(enabled: boolean) {
-    setConfig((current) => ({ ...current, exportEnabled: enabled }))
-    clearStatus()
+  async function handleExportToggle(next: boolean) {
+    const previous = config.exportEnabled
+    setSwitchSaving(true)
+    // Optimistic UI update; only `exportEnabled` changes locally so unsaved
+    // connector/path edits currently in the form stay untouched.
+    setConfig((current) => ({ ...current, exportEnabled: next }))
+    setSwitchStatus({ text: '', kind: 'idle' })
+    try {
+      const stored = await getRawConfig()
+      await saveRawConfig({ ...stored, exportEnabled: next })
+
+      const storedConnector =
+        CONNECTORS.find((c) => c.id === stored.activeConnector) ?? CONNECTORS[0]
+      if (next) {
+        const normalized = storedConnector.normalizeConfig(stored.connectors[storedConnector.id])
+        const issue = storedConnector.validateConfig(normalized)
+        setSwitchStatus(
+          issue
+            ? { text: '已开启，请填写下方连接信息后保存', kind: 'ok' }
+            : { text: `已开启保存到 ${storedConnector.name}`, kind: 'ok' },
+        )
+      } else {
+        setSwitchStatus({ text: `已关闭保存到 ${storedConnector.name}`, kind: 'ok' })
+      }
+    } catch (e) {
+      setConfig((current) => ({ ...current, exportEnabled: previous }))
+      setSwitchStatus({ text: String(e), kind: 'err' })
+    } finally {
+      setSwitchSaving(false)
+    }
   }
 
   function resetPathDefaults() {
@@ -110,20 +139,6 @@ export default function App() {
   }
 
   async function handleSave() {
-    if (!config.exportEnabled) {
-      setSaving(true)
-      setStatus({ text: '正在保存…', kind: 'muted' })
-      try {
-        await saveRawConfig(config)
-        setStatus({ text: '设置已保存', kind: 'ok' })
-      } catch (e) {
-        setStatus({ text: String(e), kind: 'err' })
-      } finally {
-        setSaving(false)
-      }
-      return
-    }
-
     const normalized = connector.normalizeConfig(config.connectors[connector.id])
     const issue = connector.validateConfig(normalized)
     if (issue) {
@@ -136,6 +151,7 @@ export default function App() {
     try {
       const toSave: ClipperConfig = {
         ...config,
+        exportEnabled: true,
         connectors: { ...config.connectors, [connector.id]: normalized },
       }
       await saveRawConfig(toSave)
@@ -175,9 +191,9 @@ export default function App() {
 
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-6 py-8">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">剪藏设置</h1>
+          <h1 className="text-xl font-semibold tracking-tight">设置</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            选择保存目标，并配置连接信息与剪藏文件的保存路径。
+            Page Clipper 会把网页抽取为 Markdown 并复制到剪贴板。也可以开启导出，把剪藏直接保存到 Obsidian。
           </p>
         </div>
 
@@ -199,9 +215,15 @@ export default function App() {
                 <Switch
                   id="export-enabled"
                   checked={config.exportEnabled}
-                  onCheckedChange={setExportEnabled}
+                  disabled={switchSaving || saving}
+                  onCheckedChange={handleExportToggle}
                 />
               </div>
+              {switchStatus.text && switchStatus.kind !== 'idle' && (
+                <StatusNotice kind={switchStatus.kind} className="animate-in fade-in duration-150">
+                  {switchStatus.text}
+                </StatusNotice>
+              )}
             </Section>
 
             {config.exportEnabled && (
@@ -236,7 +258,7 @@ export default function App() {
                         variant="outline"
                         size="sm"
                         onClick={handleTestConnection}
-                        disabled={saving || testing}
+                        disabled={saving || testing || switchSaving}
                       >
                         {testing ? <Loader2 className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
                         测试连接
@@ -311,12 +333,14 @@ export default function App() {
                   {status.text}
                 </StatusNotice>
               )}
-              <div className="flex justify-end">
-                <Button type="button" onClick={handleSave} disabled={saving || testing}>
-                  {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-                  保存设置
-                </Button>
-              </div>
+              {config.exportEnabled && (
+                <div className="flex justify-end">
+                  <Button type="button" onClick={handleSave} disabled={saving || testing || switchSaving}>
+                    {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+                    保存设置
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
