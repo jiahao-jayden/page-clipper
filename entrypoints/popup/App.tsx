@@ -273,11 +273,7 @@ export default function App() {
 		<div className="relative flex h-[600px] w-[420px] flex-col overflow-hidden bg-background">
 			<header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border px-4">
 				<div className="flex min-w-0 items-center gap-2.5">
-					<img
-						src="/icon-128.png"
-						alt=""
-						className="size-6 rounded-md ring-1 ring-border"
-					/>
+					<img src="/icon-128.png" alt="" className="size-6" />
 					<div className="flex min-w-0 items-baseline gap-2">
 						<h1 className="text-sm font-semibold tracking-tight">
 							Page Clipper

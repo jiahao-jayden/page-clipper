@@ -15,6 +15,18 @@ export default defineConfig({
     version: '0.1.0',
     description: '把任意网页一键复制为干净的 Markdown，可选保存到 Obsidian',
     permissions: ['activeTab', 'tabs', 'storage'],
+    icons: {
+      16: 'icon-16.png',
+      32: 'icon-32.png',
+      48: 'icon-48.png',
+      128: 'icon-128.png',
+    },
+    action: {
+      default_icon: {
+        16: 'icon-16.png',
+        32: 'icon-32.png',
+      },
+    },
     host_permissions: [
       'http://localhost/*',
       'http://127.0.0.1/*',

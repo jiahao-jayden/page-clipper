@@ -182,7 +182,7 @@ export default function App() {
     <div className="min-h-screen">
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-2.5 px-6">
-          <img src="/icon-128.png" alt="" className="size-7 rounded-md ring-1 ring-border" />
+          <img src="/icon-128.png" alt="" className="size-7" />
           <span className="text-sm font-semibold tracking-tight">Page Clipper</span>
           <span className="text-sm text-muted-foreground">/</span>
           <span className="text-sm text-muted-foreground">设置</span>

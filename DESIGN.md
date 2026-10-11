@@ -95,7 +95,7 @@ It explicitly rejects SaaS marketing polish, heavy Obsidian cosplay, unnecessary
 
 ### Brand Symbol
 
-The extension icon uses the "鼠尾巴 / Sage Tail" image: a quiet, precise clipping symbol that lightly curls knowledge into the user's vault. Treat it as a restrained brand mark only. Do not expand it into mascot-driven popup UI, decorative illustration, or new motion patterns.
+The extension icon uses the "鼠尾巴 / Sage Tail" image: a quiet, precise clipping symbol that lightly curls knowledge into the user's vault. Treat it as a restrained brand mark only. Do not expand it into mascot-driven popup UI, decorative illustration, or new motion patterns. The app icon itself is a rounded sage tile (primary green, ~22.5% corner radius) with a cream glyph and transparent corners, mastered at `assets/sage-tail-app-icon.png`; don't add borders/rings around it in UI — let the icon's own rounded shape show.
 
 ## 2. Colors
 
