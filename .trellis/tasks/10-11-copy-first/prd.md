@@ -60,3 +60,20 @@
 ### 验收追加
 - [ ] 拨动开关后不点保存，刷新设置页/打开 popup 状态已生效。
 - [ ] 开关切换不会覆盖未保存的连接表单编辑，也不会把它们写入存储。
+
+## 追加（第三轮）
+### popup：备注与标签仅在导出开启时显示
+- 备注、标签两块（含"最近"标签行）只在 `exportEnabled` 为 true 时渲染；它们只对保存到 Obsidian 有意义。
+- 关闭导出时预览区获得多出的高度；复制内容按 `note=''`、`tags=[]` 生成（即不残留之前输入的值）。
+- 导出从开启切到关闭（`onSettingsChanged`）时，复制结果不再包含备注/标签；是否清空 state 由实现决定，但生成的 Markdown 必须一致。
+- 复制成功后只有在导出开启时才 `saveUsedTags`。
+
+### X/Twitter：不要复制评论
+- 根因：`lib/extract/pipeline.ts` 的 `defuddleExtract` 未传 `includeReplies`，defuddle 默认 `'extractors'`，X extractor 会把回复作为评论输出。
+- `defuddleExtract` 支持可选 options 透传；`lib/adapters/twitter.ts` 调用时传 `includeReplies: false`（defuddle 会保留作者自己的连续推文 thread，只去掉他人回复）。其他平台行为不变。
+- `fallbackExtract`：只取主推文作者的 `tweetText`（按 `article[data-testid="tweet"]` 内的作者 handle 与 URL 中的作者匹配，遇到第一个其他人的推文即停止，与 defuddle 的 thread 判定一致）；匹配不到时退回第一条 tweetText。
+- outbound_urls 同样只从保留的推文里收集。
+
+### 验收追加
+- [ ] 导出关闭时 popup 不显示备注/标签，预览区更高。
+- [ ] X 推文详情页复制结果不含他人回复，作者 thread 保留。

@@ -1,5 +1,5 @@
 import Defuddle from 'defuddle'
-import type { DefuddleResponse } from 'defuddle'
+import type { DefuddleOptions, DefuddleResponse } from 'defuddle'
 import TurndownService from 'turndown'
 import { gfm } from 'turndown-plugin-gfm'
 import type { RawCapture } from '../normalize'
@@ -82,12 +82,17 @@ export interface DefuddleExtractResult {
  * 再用统一 turndown 管线把正文 HTML 转成 markdown。
  *
  * 用 parseAsync 以便 YouTube 等 extractor 能拉到字幕；失败回退同步 parse。
+ * @param options  透传给 defuddle 的额外选项（如 X/Twitter 的 includeReplies）
  */
-export async function defuddleExtract(url: string): Promise<DefuddleExtractResult> {
+export async function defuddleExtract(
+  url: string,
+  options?: Pick<DefuddleOptions, 'includeReplies'>,
+): Promise<DefuddleExtractResult> {
   const defuddle = new Defuddle(document, {
     url,
     markdown: false,
     useAsync: true,
+    ...options,
   })
 
   let response: DefuddleResponse

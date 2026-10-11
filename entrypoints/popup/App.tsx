@@ -67,8 +67,14 @@ export default function App() {
 
 	const markdown = useMemo(() => {
 		if (!capture) return "";
-		return toMarkdown({ ...capture, user_note: note, tags: selectedTags });
-	}, [capture, note, selectedTags]);
+		const effectiveNote = exportEnabled ? note : "";
+		const effectiveTags = exportEnabled ? selectedTags : [];
+		return toMarkdown({
+			...capture,
+			user_note: effectiveNote,
+			tags: effectiveTags,
+		});
+	}, [capture, note, selectedTags, exportEnabled]);
 
 	const frontmatter = useMemo(() => {
 		const end = markdown.indexOf("\n---\n", 4);
@@ -242,12 +248,14 @@ export default function App() {
 		try {
 			await navigator.clipboard.writeText(markdown);
 			setStatus({ text: "已复制完整 Markdown", kind: "ok" });
-			try {
-				const tags = normalizeTags(selectedTags);
-				const history = await saveUsedTags(tags);
-				setTagHistory(history);
-			} catch {
-				// Tag history is a convenience; a successful copy should stay successful.
+			if (exportEnabled) {
+				try {
+					const tags = normalizeTags(selectedTags);
+					const history = await saveUsedTags(tags);
+					setTagHistory(history);
+				} catch {
+					// Tag history is a convenience; a successful copy should stay successful.
+				}
 			}
 		} catch (e) {
 			setStatus({ text: `复制失败：${String(e)}`, kind: "err" });
@@ -410,73 +418,77 @@ export default function App() {
 					</div>
 				</section>
 
-				{/* Note */}
-				<section className="flex shrink-0 flex-col gap-1.5">
-					<label htmlFor="clip-note" className={LABEL}>
-						备注
-					</label>
-					<Textarea
-						id="clip-note"
-						rows={1}
-						value={note}
-						onChange={(e) => setNote(e.target.value)}
-						placeholder="可选，写入 frontmatter 的 user_note"
-						className="min-h-9 max-h-[76px] resize-none bg-background px-3 py-1.5 text-[13px] leading-5 md:text-[13px]"
-					/>
-				</section>
+				{exportEnabled && (
+					<>
+						{/* Note */}
+						<section className="flex shrink-0 flex-col gap-1.5">
+							<label htmlFor="clip-note" className={LABEL}>
+								备注
+							</label>
+							<Textarea
+								id="clip-note"
+								rows={1}
+								value={note}
+								onChange={(e) => setNote(e.target.value)}
+								placeholder="可选，写入 frontmatter 的 user_note"
+								className="min-h-9 max-h-[76px] resize-none bg-background px-3 py-1.5 text-[13px] leading-5 md:text-[13px]"
+							/>
+						</section>
 
-				{/* Tags */}
-				<section className="flex shrink-0 flex-col gap-1.5">
-					<label htmlFor="clip-tag" className={LABEL}>
-						标签
-					</label>
-					<div className="flex min-h-9 flex-wrap items-center gap-1 rounded-md border border-input bg-background px-1.5 py-1 shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/40">
-						{selectedTags.map((tag) => (
-							<span
-								key={tag}
-								className="inline-flex h-6 items-center gap-0.5 rounded bg-secondary pr-0.5 pl-1.5 text-xs text-secondary-foreground"
-							>
-								#{tag}
-								<button
-									type="button"
-									onClick={() => removeTag(tag)}
-									aria-label={`移除标签 ${tag}`}
-									className="grid size-4 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
-								>
-									<X className="size-3" />
-								</button>
-							</span>
-						))}
-						<input
-							id="clip-tag"
-							value={tagInput}
-							onChange={(e) => setTagInput(e.target.value)}
-							onKeyDown={handleTagInputKeyDown}
-							placeholder={selectedTags.length ? "" : "输入标签，回车添加"}
-							className="h-6 min-w-20 flex-1 bg-transparent px-1 text-[13px] outline-none placeholder:text-muted-foreground/80"
-						/>
-					</div>
-					{suggestedTags.length > 0 && (
-						<div className="flex items-center gap-1.5">
-							<span className="shrink-0 text-[11px] text-muted-foreground">
-								最近
-							</span>
-							<div className="flex min-w-0 gap-1 overflow-x-auto [scrollbar-width:none]">
-								{suggestedTags.map((tag) => (
-									<button
+						{/* Tags */}
+						<section className="flex shrink-0 flex-col gap-1.5">
+							<label htmlFor="clip-tag" className={LABEL}>
+								标签
+							</label>
+							<div className="flex min-h-9 flex-wrap items-center gap-1 rounded-md border border-input bg-background px-1.5 py-1 shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/40">
+								{selectedTags.map((tag) => (
+									<span
 										key={tag}
-										type="button"
-										onClick={() => addTag(tag)}
-										className="inline-flex h-6 shrink-0 items-center gap-0.5 rounded border border-dashed border-border px-1.5 text-xs text-muted-foreground transition-colors hover:border-solid hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+										className="inline-flex h-6 items-center gap-0.5 rounded bg-secondary pr-0.5 pl-1.5 text-xs text-secondary-foreground"
 									>
-										<Plus className="size-3" />
-										{tag}
-									</button>
+										#{tag}
+										<button
+											type="button"
+											onClick={() => removeTag(tag)}
+											aria-label={`移除标签 ${tag}`}
+											className="grid size-4 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+										>
+											<X className="size-3" />
+										</button>
+									</span>
 								))}
+								<input
+									id="clip-tag"
+									value={tagInput}
+									onChange={(e) => setTagInput(e.target.value)}
+									onKeyDown={handleTagInputKeyDown}
+									placeholder={selectedTags.length ? "" : "输入标签，回车添加"}
+									className="h-6 min-w-20 flex-1 bg-transparent px-1 text-[13px] outline-none placeholder:text-muted-foreground/80"
+								/>
 							</div>
-						</div>
-					)}
-				</section>
+							{suggestedTags.length > 0 && (
+								<div className="flex items-center gap-1.5">
+									<span className="shrink-0 text-[11px] text-muted-foreground">
+										最近
+									</span>
+									<div className="flex min-w-0 gap-1 overflow-x-auto [scrollbar-width:none]">
+										{suggestedTags.map((tag) => (
+											<button
+												key={tag}
+												type="button"
+												onClick={() => addTag(tag)}
+												className="inline-flex h-6 shrink-0 items-center gap-0.5 rounded border border-dashed border-border px-1.5 text-xs text-muted-foreground transition-colors hover:border-solid hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+											>
+												<Plus className="size-3" />
+												{tag}
+											</button>
+										))}
+									</div>
+								</div>
+							)}
+						</section>
+					</>
+				)}
 			</main>
 
 			<footer className="flex shrink-0 gap-2 border-t border-border bg-card px-4 py-3">

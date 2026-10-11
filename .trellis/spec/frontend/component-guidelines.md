@@ -72,6 +72,30 @@ should still fix them explicitly.
 
 ---
 
+## Convention: site extractors that include replies/comments by default
+
+**What**: Some defuddle site extractors mix other users' replies/comments into the
+extracted content unless told not to (option default is `'extractors'`, i.e. "let
+the site extractor decide" — the twitter extractor's own default is "include").
+When an adapter only wants the author's own post (thread included, replies
+excluded), pass `includeReplies: false` through `defuddleExtract(url, options)`:
+
+```typescript
+// lib/adapters/twitter.ts
+const result = await defuddleExtract(url, { includeReplies: false })
+```
+
+- This only drops *other people's* replies; defuddle's X extractor still keeps
+  the author's own consecutive thread tweets as part of the post content.
+- DOM fallback paths (when defuddle returns no markdown) must mirror the same
+  rule by hand — e.g. the twitter fallback only keeps consecutive
+  `article[data-testid="tweet"]` nodes whose handle matches the page author,
+  stopping at the first tweet by someone else.
+- Other platforms default to no special handling; only add `includeReplies`
+  (or equivalent) when a site extractor is confirmed to pull in comments.
+
+---
+
 ## Convention: Graceful fallback, never throw
 
 Every adapter degrades instead of throwing: missing root / empty text / empty
@@ -126,6 +150,13 @@ Layout (popup, fixed 420×600): brand header → source card (cover/favicon, tit
 platform · author · host) → body preview (only scrolling region; frontmatter
 collapsed behind a toggle) → note → tags → footer actions. Toasts float above
 the footer and never change layout height.
+
+Note and tags only render when export (`exportEnabled`) is on — they exist to
+feed the Obsidian save path (`user_note`/`tags` in `RawCapture`), which is a
+no-op while export is off. When off, the body preview simply gets the extra
+height (no placeholder/gap left behind), and copy/preview markdown is built
+with `user_note: ''`, `tags: []` so copied output never carries stale note/tag
+state from a previous export-enabled session.
 
 ### Convention: shared form & status primitives
 
