@@ -11,9 +11,10 @@ export default defineConfig({
     plugins: [tailwindcss()],
   } as WxtViteConfig),
   manifest: {
-    name: 'Page Clipper',
+    name: '__MSG_appName__',
     version: '0.1.0',
-    description: '把任意网页一键复制为干净的 Markdown，可选保存到 Obsidian',
+    description: '__MSG_appDescription__',
+    default_locale: 'zh_CN',
     permissions: ['activeTab', 'tabs', 'storage'],
     icons: {
       16: 'icon-16.png',
