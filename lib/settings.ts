@@ -27,6 +27,8 @@ const TEMPLATE_VARIABLES = new Set(['platform', 'date', 'slug'])
 export interface ClipperConfig {
   activeConnector: string
   connectors: Record<string, Record<string, string>>
+  /** Whether the optional "save to an app" (e.g. Obsidian) export is enabled. Defaults to `false`. */
+  exportEnabled: boolean
 }
 
 export function normalizeSettings(settings: Partial<ClipperSettings> = {}): ClipperSettings {
@@ -50,6 +52,7 @@ export function migrateConfig(stored: unknown): ClipperConfig {
     return {
       activeConnector: config.activeConnector || DEFAULT_CONNECTOR_ID,
       connectors: { ...(config.connectors ?? {}) },
+      exportEnabled: config.exportEnabled ?? false,
     }
   }
 
@@ -62,6 +65,9 @@ export function migrateConfig(stored: unknown): ClipperConfig {
     connectors: hasLegacy
       ? { [DEFAULT_CONNECTOR_ID]: legacy as Record<string, string> }
       : {},
+    // Old flat-settings installs are migrated with export left off; their connection
+    // fields are preserved so re-enabling needs no re-entry.
+    exportEnabled: false,
   }
 }
 

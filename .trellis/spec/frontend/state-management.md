@@ -78,9 +78,18 @@ export interface Connector {
 - Register connectors in the `REGISTRY` array in `lib/connectors/index.ts`. The
   options page enumerates them via `listConnectors()`; background resolves the
   active one via `resolveConnector` / `saveWithActiveConnector`.
-- The popup validates the *active connector* via `validateActiveConnector()`
-  (replaces the old `validateSettings(getSettings())`), blocking clip + showing
-  the "去设置" entry on missing config or failed connection (`needsSettings`).
+- Export to a connector is **opt-in**: `ClipperConfig.exportEnabled` (default
+  `false`; `migrateConfig` defaults missing values and legacy flat configs to
+  `false` but keeps their connector fields). `getActiveConnectorState()` returns
+  `enabled`. Copying Markdown is the primary action and never depends on it.
+- Only when `enabled`, the popup shows the "保存到 {name}" button and validates
+  the active connector, blocking save + showing the "去设置" entry on missing
+  config (`needsSettings`). Background `CAPTURE` re-checks `enabled` and refuses
+  to write when off (`{ ok:false, error:'<name> 导入未开启', needsSettings:true }`).
+- Turning export off in options saves `exportEnabled:false` without validating
+  or clearing connector config, so re-enabling needs no re-entry.
+- Storage keys keep the legacy `obsidianWikiClipper.*` prefix after the Page
+  Clipper rename — renaming them would drop users' saved config.
 
 ### 4. Validation & Error Matrix
 
@@ -90,7 +99,8 @@ export interface Connector {
 | Content script not ready | `{ ok:false, error:'…reload the page and try again' }` (do not throw) |
 | Adapter throws | Should not happen — adapters fall back to `generic` (see component-guidelines) |
 | Vault PUT non-2xx | `writeRaw` throws `Vault write failed: <status>` → surfaced as `{ ok:false }` |
-| Missing REST URL/token or failed connection test | popup blocks clipping and links to options page |
+| Missing REST URL/token or failed connection test (export enabled) | popup blocks saving (copy still works) and links to options page |
+| Export disabled | popup hides save; background `CAPTURE` returns `<name> 导入未开启` |
 
 ### 5. Good/Base/Bad Cases
 

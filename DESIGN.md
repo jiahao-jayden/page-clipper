@@ -1,6 +1,6 @@
 ---
-name: Wiki Clipper
-description: A calm, precise clipping tool for moving web content into a knowledge base.
+name: Page Clipper
+description: A calm, precise tool for copying web content into clean Markdown, with Obsidian as an optional save destination.
 colors:
   background: "oklch(1 0 0)"
   foreground: "oklch(0.145 0.006 145)"
@@ -74,7 +74,7 @@ components:
     padding: "8px 12px"
 ---
 
-# Design System: Wiki Clipper
+# Design System: Page Clipper
 
 ## 1. Overview
 

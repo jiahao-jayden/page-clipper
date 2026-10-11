@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { StatusNotice, type StatusKind } from '@/components/status-notice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import {
   getRawConfig,
   listConnectors,
@@ -28,6 +29,7 @@ function buildInitialConfig(raw: ClipperConfig): ClipperConfig {
     activeConnector:
       CONNECTORS.find((c) => c.id === raw.activeConnector)?.id ?? DEFAULT_CONNECTOR_ID,
     connectors,
+    exportEnabled: raw.exportEnabled,
   }
 }
 
@@ -35,6 +37,7 @@ export default function App() {
   const [config, setConfig] = useState<ClipperConfig>(() => ({
     activeConnector: DEFAULT_CONNECTOR_ID,
     connectors: {},
+    exportEnabled: false,
   }))
   const [status, setStatus] = useState<StatusState>({ text: '', kind: 'idle' })
   const [loading, setLoading] = useState(true)
@@ -89,6 +92,11 @@ export default function App() {
     clearStatus()
   }
 
+  function setExportEnabled(enabled: boolean) {
+    setConfig((current) => ({ ...current, exportEnabled: enabled }))
+    clearStatus()
+  }
+
   function resetPathDefaults() {
     setConfig((current) => {
       const next = { ...current.connectors[connector.id] }
@@ -102,6 +110,20 @@ export default function App() {
   }
 
   async function handleSave() {
+    if (!config.exportEnabled) {
+      setSaving(true)
+      setStatus({ text: '正在保存…', kind: 'muted' })
+      try {
+        await saveRawConfig(config)
+        setStatus({ text: '设置已保存', kind: 'ok' })
+      } catch (e) {
+        setStatus({ text: String(e), kind: 'err' })
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+
     const normalized = connector.normalizeConfig(config.connectors[connector.id])
     const issue = connector.validateConfig(normalized)
     if (issue) {
@@ -145,7 +167,7 @@ export default function App() {
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-2.5 px-6">
           <img src="/icon-128.png" alt="" className="size-7 rounded-md ring-1 ring-border" />
-          <span className="text-sm font-semibold tracking-tight">Wiki Clipper</span>
+          <span className="text-sm font-semibold tracking-tight">Page Clipper</span>
           <span className="text-sm text-muted-foreground">/</span>
           <span className="text-sm text-muted-foreground">设置</span>
         </div>
@@ -166,101 +188,121 @@ export default function App() {
           </div>
         ) : (
           <>
-            <Section title="保存目标" description="剪藏内容将写入这里。未来会支持更多目标（如 Notion）。">
-              <Field id="connector" label="目标应用">
-                <div className="relative">
-                  <select
-                    id="connector"
-                    value={connector.id}
-                    onChange={(e) => selectConnector(e.target.value)}
-                    className="h-9 w-full appearance-none rounded-md border border-input bg-background pr-9 pl-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40"
-                  >
-                    {CONNECTORS.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                </div>
-              </Field>
+            <Section
+              title="导出到应用"
+              description="开启后 popup 会多一个保存按钮，把剪藏写入 vault。复制功能始终可用。"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <label htmlFor="export-enabled" className="text-[13px] font-medium">
+                  保存到 Obsidian
+                </label>
+                <Switch
+                  id="export-enabled"
+                  checked={config.exportEnabled}
+                  onCheckedChange={setExportEnabled}
+                />
+              </div>
             </Section>
 
-            {connectionFields.length > 0 && (
-              <Section
-                title="连接"
-                description={`${connector.name} 的访问地址与凭据，仅保存在本机浏览器中。`}
-                action={
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTestConnection}
-                    disabled={saving || testing}
-                  >
-                    {testing ? <Loader2 className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
-                    测试连接
-                  </Button>
-                }
-              >
-                {connectionFields.map((field) => (
-                  <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
-                    <Input
-                      id={field.key}
-                      type={field.type === 'password' ? 'password' : 'text'}
-                      value={connectorConfig[field.key] ?? ''}
-                      onChange={(e) => updateField(field.key, e.target.value)}
-                      placeholder={field.placeholder}
-                      spellCheck={false}
-                      autoComplete="off"
-                    />
+            {config.exportEnabled && (
+              <>
+                <Section title="保存目标" description="剪藏内容将写入这里。未来会支持更多目标（如 Notion）。">
+                  <Field id="connector" label="目标应用">
+                    <div className="relative">
+                      <select
+                        id="connector"
+                        value={connector.id}
+                        onChange={(e) => selectConnector(e.target.value)}
+                        className="h-9 w-full appearance-none rounded-md border border-input bg-background pr-9 pl-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40"
+                      >
+                        {CONNECTORS.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
                   </Field>
-                ))}
-              </Section>
-            )}
+                </Section>
 
-            {pathFields.length > 0 && (
-              <Section
-                title="保存路径"
-                description={
-                  <>
-                    支持变量 <Code>{'{platform}'}</Code> <Code>{'{date}'}</Code> <Code>{'{slug}'}</Code>
-                  </>
-                }
-                action={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground"
-                    onClick={resetPathDefaults}
+                {connectionFields.length > 0 && (
+                  <Section
+                    title="连接"
+                    description={`${connector.name} 的访问地址与凭据，仅保存在本机浏览器中。`}
+                    action={
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleTestConnection}
+                        disabled={saving || testing}
+                      >
+                        {testing ? <Loader2 className="size-4 animate-spin" /> : <PlugZap className="size-4" />}
+                        测试连接
+                      </Button>
+                    }
                   >
-                    <RotateCcw className="size-4" />
-                    恢复默认
-                  </Button>
-                }
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {pathFields.map((field) => (
-                    <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
-                      <Input
-                        id={field.key}
-                        value={connectorConfig[field.key] ?? ''}
-                        onChange={(e) => updateField(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        spellCheck={false}
-                        className="font-mono text-[13px]"
-                      />
-                    </Field>
-                  ))}
-                </div>
-                <div className="flex items-baseline gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
-                  <span className="shrink-0 text-muted-foreground">示例</span>
-                  <span className="truncate font-mono text-foreground/80">
-                    _raw/bookmarks/x/2026-06-25-example.md
-                  </span>
-                </div>
-              </Section>
+                    {connectionFields.map((field) => (
+                      <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
+                        <Input
+                          id={field.key}
+                          type={field.type === 'password' ? 'password' : 'text'}
+                          value={connectorConfig[field.key] ?? ''}
+                          onChange={(e) => updateField(field.key, e.target.value)}
+                          placeholder={field.placeholder}
+                          spellCheck={false}
+                          autoComplete="off"
+                        />
+                      </Field>
+                    ))}
+                  </Section>
+                )}
+
+                {pathFields.length > 0 && (
+                  <Section
+                    title="保存路径"
+                    description={
+                      <>
+                        支持变量 <Code>{'{platform}'}</Code> <Code>{'{date}'}</Code> <Code>{'{slug}'}</Code>
+                      </>
+                    }
+                    action={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground"
+                        onClick={resetPathDefaults}
+                      >
+                        <RotateCcw className="size-4" />
+                        恢复默认
+                      </Button>
+                    }
+                  >
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {pathFields.map((field) => (
+                        <Field key={field.key} id={field.key} label={field.label} hint={field.hint}>
+                          <Input
+                            id={field.key}
+                            value={connectorConfig[field.key] ?? ''}
+                            onChange={(e) => updateField(field.key, e.target.value)}
+                            placeholder={field.placeholder}
+                            spellCheck={false}
+                            className="font-mono text-[13px]"
+                          />
+                        </Field>
+                      ))}
+                    </div>
+                    <div className="flex items-baseline gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
+                      <span className="shrink-0 text-muted-foreground">示例</span>
+                      <span className="truncate font-mono text-foreground/80">
+                        _raw/bookmarks/x/2026-06-25-example.md
+                      </span>
+                    </div>
+                  </Section>
+                )}
+              </>
             )}
 
             <div className="flex flex-col gap-3">

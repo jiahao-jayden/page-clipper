@@ -6,11 +6,11 @@ product
 
 ## Users
 
-Heavy knowledge-base users who clip web pages into a durable personal or team knowledge system. The current implementation writes to Obsidian, but the product direction is broader: a focused clipping tool for getting web content into a knowledge base with minimal cleanup.
+Heavy knowledge-base users who clip web pages into a durable personal or team knowledge system. The product is copy-first: it always produces clean Markdown the user can paste anywhere, and saving straight into Obsidian is an optional, opt-in destination for users who already keep a vault.
 
 ## Product Purpose
 
-Wiki Clipper extracts the active page, normalizes it into readable Markdown, lets the user review or annotate it, and saves it into a knowledge-base destination. Success means clipping feels quick, trustworthy, and low-friction: the user can understand what will be saved, make a small adjustment when needed, and move on.
+Page Clipper extracts the active page, normalizes it into readable Markdown, lets the user review or annotate it, and copies it to the clipboard. Saving into a knowledge-base destination (Obsidian today) is an optional extra, switched on in settings. Success means clipping feels quick, trustworthy, and low-friction: the user can understand what will be copied (or saved), make a small adjustment when needed, and move on.
 
 ## Brand Personality
 
@@ -22,10 +22,10 @@ This should not look like a SaaS marketing surface with gradients, inflated card
 
 ## Design Principles
 
-1. Preserve the user's flow: every interaction should reduce the distance between page, preview, and saved knowledge.
-2. Make extraction trustworthy: show enough source, status, and preview context for the user to know what is being saved.
+1. Preserve the user's flow: every interaction should reduce the distance between page, preview, and copied/saved knowledge.
+2. Make extraction trustworthy: show enough source, status, and preview context for the user to know what is being copied or saved.
 3. Stay visually quiet: use restraint, density, and familiar product patterns instead of decorative effects.
-4. Keep destination flexibility in mind: Obsidian is the first target, but the design should not hard-code the product identity around Obsidian alone.
+4. Copy is the default, universal action; saving to an app (Obsidian first) is an optional destination the user opts into, not a hard requirement to use the product.
 5. Prefer precise feedback over ceremony: loading, errors, copying, and saving should be immediate and clearly worded.
 
 ## Accessibility & Inclusion

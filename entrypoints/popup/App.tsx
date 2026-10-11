@@ -52,6 +52,7 @@ export default function App() {
 	const [status, setStatus] = useState<StatusState>({ text: "", kind: "idle" });
 	const [configIssue, setConfigIssue] = useState("");
 	const [connectorName, setConnectorName] = useState("");
+	const [exportEnabled, setExportEnabled] = useState(false);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [tagInput, setTagInput] = useState("");
 	const [tagHistory, setTagHistory] = useState<string[]>([]);
@@ -80,10 +81,12 @@ export default function App() {
 		let alive = true;
 		const refresh = async () => {
 			try {
-				const { connector, connectorConfig } = await getActiveConnectorState();
+				const { connector, connectorConfig, enabled } =
+					await getActiveConnectorState();
 				if (!alive) return;
 				setConnectorName(connector.name);
-				setConfigIssue(connector.validateConfig(connectorConfig) ?? "");
+				setExportEnabled(enabled);
+				setConfigIssue(enabled ? connector.validateConfig(connectorConfig) ?? "" : "");
 			} catch (e) {
 				if (alive) setConfigIssue(String(e));
 			}
@@ -200,13 +203,13 @@ export default function App() {
 	}
 
 	async function handleClip() {
-		if (!capture) return;
+		if (!capture || !exportEnabled) return;
 		if (configIssue) {
 			setStatus({ text: `请先完成设置：${configIssue}`, kind: "err" });
 			return;
 		}
 		setClipping(true);
-		setStatus({ text: "剪藏中…", kind: "muted" });
+		setStatus({ text: "保存中…", kind: "muted" });
 		try {
 			const tags = normalizeTags(selectedTags);
 			const res = await chrome.runtime.sendMessage({
@@ -239,6 +242,13 @@ export default function App() {
 		try {
 			await navigator.clipboard.writeText(markdown);
 			setStatus({ text: "已复制完整 Markdown", kind: "ok" });
+			try {
+				const tags = normalizeTags(selectedTags);
+				const history = await saveUsedTags(tags);
+				setTagHistory(history);
+			} catch {
+				// Tag history is a convenience; a successful copy should stay successful.
+			}
 		} catch (e) {
 			setStatus({ text: `复制失败：${String(e)}`, kind: "err" });
 		}
@@ -249,7 +259,7 @@ export default function App() {
 	const displayHost = pageContext.hostname.replace(/^www\./, "");
 	const cover = capture?.og_image && !coverFailed ? capture.og_image : "";
 	const suggestedTags = tagHistory.filter((tag) => !selectedTags.includes(tag));
-	const showConfigIssue = !!configIssue && !configDismissed;
+	const showConfigIssue = exportEnabled && !!configIssue && !configDismissed;
 
 	return (
 		<div className="relative flex h-[600px] w-[420px] flex-col overflow-hidden bg-background">
@@ -262,9 +272,9 @@ export default function App() {
 					/>
 					<div className="flex min-w-0 items-baseline gap-2">
 						<h1 className="text-sm font-semibold tracking-tight">
-							Wiki Clipper
+							Page Clipper
 						</h1>
-						{connectorName && (
+						{exportEnabled && connectorName && (
 							<span className="truncate text-xs text-muted-foreground">
 								→ {connectorName}
 							</span>
@@ -472,26 +482,28 @@ export default function App() {
 			<footer className="flex shrink-0 gap-2 border-t border-border bg-card px-4 py-3">
 				<Button
 					className="flex-1"
-					onClick={handleClip}
-					disabled={!capture || clipping || !!configIssue}
-				>
-					{clipping ? (
-						<Loader2 className="size-4 animate-spin" />
-					) : (
-						<Scissors className="size-4" />
-					)}
-					{connectorName ? `剪藏到 ${connectorName}` : "剪藏"}
-				</Button>
-				<Button
-					variant="outline"
-					className="shrink-0"
 					onClick={handleCopy}
 					disabled={!capture}
-					title="复制完整 Markdown"
 				>
 					<Copy className="size-4" />
-					复制
+					复制 Markdown
 				</Button>
+				{exportEnabled && (
+					<Button
+						variant="outline"
+						className="shrink-0"
+						onClick={handleClip}
+						disabled={!capture || clipping || !!configIssue}
+						title={connectorName ? `保存到 ${connectorName}` : "保存"}
+					>
+						{clipping ? (
+							<Loader2 className="size-4 animate-spin" />
+						) : (
+							<Scissors className="size-4" />
+						)}
+						{connectorName ? `保存到 ${connectorName}` : "保存"}
+					</Button>
+				)}
 			</footer>
 
 			{(status.text || showConfigIssue) && (
@@ -528,7 +540,7 @@ export default function App() {
 							}
 							className="pointer-events-auto items-center shadow-md animate-in fade-in slide-in-from-bottom-1 duration-200 [&_[data-icon]]:mt-0"
 						>
-							剪藏前需要完成设置：{configIssue}
+							保存前需要完成设置：{configIssue}
 						</StatusNotice>
 					)}
 				</div>

@@ -11,9 +11,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   } as WxtViteConfig),
   manifest: {
-    name: 'Wiki Clipper',
+    name: 'Page Clipper',
     version: '0.1.0',
-    description: '剪藏网页内容到 Obsidian wiki',
+    description: '把任意网页一键复制为干净的 Markdown，可选保存到 Obsidian',
     permissions: ['activeTab', 'tabs', 'storage'],
     host_permissions: [
       'http://localhost/*',

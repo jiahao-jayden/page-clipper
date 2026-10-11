@@ -44,12 +44,19 @@ interface ActiveConnectorState {
   config: ClipperConfig
   connector: Connector
   connectorConfig: ConnectorConfig
+  /** Whether the optional export-to-app feature is turned on (see {@link ClipperConfig}). */
+  enabled: boolean
 }
 
 export async function getActiveConnectorState(): Promise<ActiveConnectorState> {
   const config = await getRawConfig()
   const connector = resolveConnector(config)
-  return { config, connector, connectorConfig: getConnectorConfig(config, connector) }
+  return {
+    config,
+    connector,
+    connectorConfig: getConnectorConfig(config, connector),
+    enabled: config.exportEnabled,
+  }
 }
 
 /** Returns a config error string for the active connector, or `null` when valid. */

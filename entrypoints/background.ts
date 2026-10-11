@@ -1,5 +1,5 @@
 import type { RawCapture } from '../lib/normalize'
-import { saveWithActiveConnector } from '../lib/connectors'
+import { getActiveConnectorState, saveWithActiveConnector } from '../lib/connectors'
 import { normalizeTags } from '../lib/tags'
 
 export default defineBackground(() => {
@@ -55,6 +55,18 @@ async function capture(
     sendResponse({ ok: false, error: 'No extracted data to capture' })
     return
   }
+
+  try {
+    const { connector, enabled } = await getActiveConnectorState()
+    if (!enabled) {
+      sendResponse({ ok: false, error: `${connector.name} 导入未开启`, needsSettings: true })
+      return
+    }
+  } catch (e) {
+    sendResponse({ ok: false, error: String(e), needsSettings: true })
+    return
+  }
+
   const capture: RawCapture = { ...data, user_note: note, tags }
 
   try {
