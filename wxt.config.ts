@@ -12,7 +12,7 @@ export default defineConfig({
   } as WxtViteConfig),
   manifest: {
     name: '__MSG_appName__',
-    version: '0.1.0',
+    version: '0.1.1',
     description: '__MSG_appDescription__',
     default_locale: 'zh_CN',
     permissions: ['activeTab', 'tabs', 'storage'],
